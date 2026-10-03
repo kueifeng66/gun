@@ -880,6 +880,23 @@
       // Keyboard Controls
       window.addEventListener('keydown', (e) => {
         this.sound.init();
+		
+		if (e.code === 'Enter' && this.state === 'GAMEOVER') {
+				this.gameoverModal.classList.remove('active');
+				this.score = 0;
+				this.ballsPopped = 0;
+				this.startLevel(1);
+				e.preventDefault();
+			return;
+		}
+
+		if (e.code === 'Enter' && this.state === 'LEVEL_CLEARED') {
+				this.levelModal.classList.remove('active');
+				this.startLevel(this.level + 1);
+				e.preventDefault();
+			return;
+		}
+		
         if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
           this.input.left = true;
         } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
@@ -1058,7 +1075,7 @@
       this.popups = [];
       this.balls = [];
 
-      // The game starts with a ball, and the number of balls increases with each level cleared.
+      // The game starts with 2 balls, and the number of balls increases with each level cleared.
       const initialBallCount = this.level;
 
       // Spawn initial balls
