@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>AeroBounce - Arrow Ball Arcade</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="game-wrapper">
+    <!-- Top HUD Bar -->
+    <header id="hud">
+      <div class="hud-item" id="score-box">
+        <span class="hud-label">SCORE</span>
+        <span class="hud-val" id="hud-score">0</span>
+      </div>
+      <div class="hud-item" id="level-box">
+        <span class="hud-label">LEVEL</span>
+        <span class="hud-val" id="hud-level">1</span>
+      </div>
+      <div class="hud-item" id="balls-box">
+        <span class="hud-label">BALLS</span>
+        <span class="hud-val" id="hud-balls">2</span>
+      </div>
+      <div class="hud-item" id="hiscore-box">
+        <span class="hud-label">BEST</span>
+        <span class="hud-val" id="hud-hiscore">0</span>
+      </div>
+      <div class="hud-controls">
+        <button id="btn-sound" class="icon-btn" aria-label="Toggle Sound" title="Sound Mute/Unmute">🔊</button>
+        <button id="btn-pause" class="icon-btn" aria-label="Pause Game" title="Pause">⏸</button>
+      </div>
+    </header>
+
+    <!-- Main Canvas Viewport -->
+    <div id="canvas-container">
+      <canvas id="game-canvas"></canvas>
+
+      <!-- Desktop Keyboard Hint Overlay (Fades out when playing) -->
+      <div id="desktop-hint" class="hint-overlay">
+        <span>[ ◄ / A ] Left</span>
+        <span>[ ► / D ] Right</span>
+        <span>[ SPACE / ▲ / W ] Shoot Up</span>
+      </div>
+    </div>
+
+    <!-- Mobile / Tablet On-Screen Touch Controls -->
+    <div id="touch-controls" class="touch-layer">
+      <div class="touch-left-cluster">
+        <button id="btn-left" class="touch-btn move-btn" aria-label="Move Left">◀</button>
+        <button id="btn-right" class="touch-btn move-btn" aria-label="Move Right">▶</button>
+      </div>
+      <div class="touch-right-cluster">
+        <button id="btn-shoot" class="touch-btn shoot-btn" aria-label="Shoot Upward">
+          <span class="shoot-arrow">▲</span>
+          <span class="shoot-text">FIRE</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- UI Overlay Modals -->
+    <!-- Start Screen -->
+    <div id="start-modal" class="modal-backdrop active">
+      <div class="modal-card">
+        <div class="title-badge">ARCADE ACTION</div>
+        <h1 class="game-title">AERO<span class="highlight">BOUNCE</span></h1>
+        <p class="tagline">Pop the bouncing spheres before they crush you!</p>
+        
+        <div class="rules-card">
+          <div class="rule-row">
+            <span class="rule-icon">🏹</span>
+            <span>Your arrow gun only shoots <strong>straight up (+y)</strong>.</span>
+          </div>
+          <div class="rule-row">
+            <span class="rule-icon">🔴</span>
+            <span>Frictionless balls bounce indefinitely under Newtonian gravity!</span>
+          </div>
+          <div class="rule-row">
+            <span class="rule-icon">💥</span>
+            <span><strong>Large</strong> splits into 2 <strong>Medium</strong> &rarr; splits into 2 <strong>Small</strong> &rarr; pops!</span>
+          </div>
+          <div class="rule-row">
+            <span class="rule-icon">⚠️</span>
+            <span>One touch by any ball is <strong>instant defeat</strong>.</span>
+          </div>
+        </div>
+
+        <button id="btn-start" class="primary-btn glow-btn">START GAME</button>
+        <div class="device-hint">Desktop: Arrow keys / A-D to move, Space to shoot<br>Mobile / Tablet: Touch screen buttons</div>
+      </div>
+    </div>
+
+    <!-- Level Cleared Modal -->
+    <div id="level-modal" class="modal-backdrop">
+      <div class="modal-card celebration">
+        <div class="stars-icon">✨ ⭐ ✨</div>
+        <h2 class="modal-title">LEVEL <span id="cleared-level-num">1</span> CLEARED!</h2>
+        <p class="modal-subtitle">Great reflexes! All bouncing balls neutralized.</p>
+        <div class="level-stats">
+          <div class="stat-box">
+            <span class="stat-lbl">CLEAR BONUS</span>
+            <span class="stat-val" id="level-bonus-val">+1,000</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-lbl">NEXT LEVEL BALLS</span>
+            <span class="stat-val" id="next-level-balls">3</span>
+          </div>
+        </div>
+        <button id="btn-next-level" class="primary-btn glow-btn">NEXT LEVEL ▶</button>
+      </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameover-modal" class="modal-backdrop">
+      <div class="modal-card danger">
+        <div class="skull-icon">💥</div>
+        <h2 class="modal-title gameover-title">GAME OVER</h2>
+        <p class="modal-subtitle">You were crushed by a bouncing sphere!</p>
+        
+        <div class="gameover-stats">
+          <div class="stat-box highlight-box">
+            <span class="stat-lbl">FINAL SCORE</span>
+            <span class="stat-val" id="final-score">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-lbl">BEST SCORE</span>
+            <span class="stat-val" id="final-hiscore">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-lbl">LEVEL REACHED</span>
+            <span class="stat-val" id="final-level">1</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-lbl">BALLS DESTROYED</span>
+            <span class="stat-val" id="final-balls-popped">0</span>
+          </div>
+        </div>
+
+        <button id="btn-restart" class="primary-btn glow-btn">PLAY AGAIN ↺</button>
+      </div>
+    </div>
+
+    <!-- Pause Modal -->
+    <div id="pause-modal" class="modal-backdrop">
+      <div class="modal-card">
+        <h2 class="modal-title">GAME PAUSED</h2>
+        <p class="modal-subtitle">Take a breath, then resume the battle.</p>
+        <button id="btn-resume" class="primary-btn glow-btn">RESUME</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
