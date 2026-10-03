@@ -1058,8 +1058,8 @@
       this.popups = [];
       this.balls = [];
 
-      // The game starts with 2 balls, and the number of balls increases with each level cleared.
-      const initialBallCount = this.level + 1;
+      // The game starts with a ball, and the number of balls increases with each level cleared.
+      const initialBallCount = this.level;
 
       // Spawn initial balls
       for (let i = 0; i < initialBallCount; i++) {
