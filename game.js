@@ -811,6 +811,8 @@
       this.score = 0;
       this.hiscore = parseInt(localStorage.getItem('aerobounce_hiscore') || '0', 10);
       this.ballsPopped = 0;
+      this.levelStartScore = 0;
+      this.levelStartBallsPopped = 0;
 
       // Entities
       this.player = new Player();
@@ -855,6 +857,7 @@
       this.finalLevel = document.getElementById('final-level');
       this.finalBallsPopped = document.getElementById('final-balls-popped');
 
+      this.btnRestart = document.getElementById('btn-restart');
       this.btnSound = document.getElementById('btn-sound');
       this.btnPause = document.getElementById('btn-pause');
 
@@ -883,9 +886,7 @@
 		
 		if (e.code === 'Enter' && this.state === 'GAMEOVER') {
 				this.gameoverModal.classList.remove('active');
-				this.score = 0;
-				this.ballsPopped = 0;
-				this.startLevel(1);
+				this.startLevel(this.level, true);
 				e.preventDefault();
 			return;
 		}
@@ -990,6 +991,8 @@
       document.getElementById('btn-start').addEventListener('click', () => {
         this.sound.init();
         this.startModal.classList.remove('active');
+        this.score = 0;
+        this.ballsPopped = 0;
         this.startLevel(1);
       });
 
@@ -999,12 +1002,10 @@
         this.startLevel(this.level + 1);
       });
 
-      document.getElementById('btn-restart').addEventListener('click', () => {
+      this.btnRestart.addEventListener('click', () => {
         this.sound.init();
         this.gameoverModal.classList.remove('active');
-        this.score = 0;
-        this.ballsPopped = 0;
-        this.startLevel(1);
+        this.startLevel(this.level, true);
       });
 
       document.getElementById('btn-resume').addEventListener('click', () => {
@@ -1066,9 +1067,23 @@
     // =========================================================
     // LEVEL SETUP & INITIALIZATION
     // =========================================================
-    startLevel(levelNum) {
+    startLevel(levelNum, isRetry = false) {
       this.level = levelNum;
       this.state = 'PLAYING';
+
+      if (!isRetry) {
+        this.levelStartScore = this.score;
+        this.levelStartBallsPopped = this.ballsPopped;
+      } else {
+        this.score = this.levelStartScore;
+        this.ballsPopped = this.levelStartBallsPopped;
+      }
+
+      this.input.left = false;
+      this.input.right = false;
+      this.input.shoot = false;
+      this.shootCooldown = 0;
+
       this.player.reset();
       this.arrows = [];
       this.particles = [];
@@ -1239,6 +1254,10 @@
       this.finalHiscore.textContent = this.hiscore.toLocaleString();
       this.finalLevel.textContent = this.level;
       this.finalBallsPopped.textContent = this.ballsPopped;
+
+      if (this.btnRestart) {
+        this.btnRestart.textContent = `RETRY LEVEL ${this.level} ↺`;
+      }
 
       setTimeout(() => {
         this.gameoverModal.classList.add('active');
